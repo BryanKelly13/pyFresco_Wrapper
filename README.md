@@ -10,6 +10,7 @@ Features
     Automatically generates and runs FRESCO input files.
 
     Extracts and plots angular distributions.
+    Python >= 3.8 (recommended 3.9+)
 
 ## Setup
 
