@@ -235,11 +235,14 @@ def createInputFile(energies, ns, ls, js_transfer, js_finalstate, deuteron_pot, 
     th_max = f"{config['angle_max']:4.1f}"
     th_step = f"{config['angle_step']:3.1f}"
     at = float(config['AT'])
+    at_fmt = f"{float(config['AT']):8.1f}"
     residual_mass = float(config['residual_mass'])
+    residual_mass_fmt = f"{float(config['residual_mass']):8.1f}"
     match = re.match(r"(\d+)([A-Za-z]+)", config['label_out'])
     mass, element = match.groups()
     label_out_reversed = element.lower() + mass
     evenMassFinal = True if int(config['label_out'][0:2]) % 2 == 0 else False
+    beam_energy = f"{float(config['beam_energy']):4.1f}"  
     
     # This is the loop that creates the input file for each state, which is based on the number of
     # states in the input_generator.inp file.
@@ -273,11 +276,11 @@ def createInputFile(energies, ns, ls, js_transfer, js_finalstate, deuteron_pot, 
 1H      1.0078  1.0        1  {config['label_out']:<8}{mass_out} {Z_fmt}    {q}
 0.5   +1 0.0               2  {js_finalstate[i]}   {final_parity} {e}
 
-  1 0  0    {at}     0.0   {deuteron_pot['rc0']:5.3f}
+  1 0  0{at_fmt}     0.0   {deuteron_pot['rc0']:5.3f}
   1 1  0   {deuteron_pot['V']:5.2f}   {deuteron_pot['r0']:5.3f}   {deuteron_pot['a']:5.3f}   {deuteron_pot['Vi']:5.3f}   {deuteron_pot['ri0']:5.3f}   {deuteron_pot['ai']:5.3f}
   1 2  0                           {deuteron_pot['Vsi']:5.2f}   {deuteron_pot['rsi0']:5.3f}   {deuteron_pot['asi']:5.3f}
   1 3  0   {deuteron_pot['Vso']:5.2f}   {deuteron_pot['rso0']:5.3f}   {deuteron_pot['aso']:5.3f}   {deuteron_pot['Vsoi']:5.2f}   {deuteron_pot['rsoi0']:5.3f}   {deuteron_pot['asoi']:5.3f}
-  2 0  0    {residual_mass}     0.0   {proton_pot['rc0']:5.3f}
+  2 0  0{residual_mass_fmt}     0.0   {proton_pot['rc0']:5.3f}
   2 1  0   {proton_pot['V']:5.2f}   {proton_pot['r0']:5.3f}   {proton_pot['a']:5.3f}   {proton_pot['Vi']:5.3f}   {proton_pot['ri0']:5.3f}   {proton_pot['ai']:5.3f}
   2 2  0                           {proton_pot['Vsi']:5.2f}   {proton_pot['rsi0']:5.3f}   {proton_pot['asi']:5.3f}
   2 3  0   {proton_pot['Vso']:5.2f}   {proton_pot['rso0']:5.3f}   {proton_pot['aso']:5.3f}   {proton_pot['Vsoi']:5.2f}   {proton_pot['rsoi0']:5.3f}   {proton_pot['asoi']:5.3f}
@@ -286,7 +289,7 @@ def createInputFile(energies, ns, ls, js_transfer, js_finalstate, deuteron_pot, 
   3 3  5    1.00            1.00
   3 4  5    1.00            1.00
   3 7  5    1.00            1.00
-  4 0  0    {residual_mass}     0.0    1.25
+  4 0  0{residual_mass_fmt}     0.0    1.25
   4 1  0    50.0    1.25    0.65
   4 3  0     6.0    1.25    0.65
 0
@@ -298,7 +301,7 @@ def createInputFile(energies, ns, ls, js_transfer, js_finalstate, deuteron_pot, 
        2   1   1   3  1.0000
 0
    0   1   1
-16.0
+{beam_energy}
 EOF
 '''
         # Handles the output logic, depending on whether you land on even/odd nucleus depends on interpretation of the js_finalstate
@@ -322,8 +325,8 @@ EOF
 def main():
     config = load_reaction_config("reaction_config.json")
     beam_energy, zt, at, residual_mass = config["beam_energy"], config["Z"], config["AT"], config["residual_mass"]
-    deuteron_pot = adwa_pot.Wales_Johnson_deutron_AWDA(beam_energy, zt, at)
-    proton_pot = adwa_pot.koning_delaroche_proton_potential(beam_energy, zt, residual_mass)
+    deuteron_pot = adwa_pot.Wales_Johnson_deutron_AWDA(beam_energy, zt, at, params={})
+    proton_pot = adwa_pot.koning_delaroche_proton_potential(beam_energy, zt, residual_mass, params={})
 
     # Utility print function if you pass optional arg. 'print_params'
      # Optional print-only mode
